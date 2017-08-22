@@ -20,18 +20,22 @@ class Game {
 
     private val boardModel = BoardModel(10, 20)
     private val boardView = BoardView(Rectangle(0.0, 0.0, width, height), context, boardModel)
+    private val gameModel = GameModel()
 
     private fun handleInputs() {
     }
 
-    var elapsedTime = 0L
+    private var frame = 0
+
     private fun update(delta: Long) {
-        elapsedTime += delta
-        if (elapsedTime >= 500) {
+        if (frame >= framesPerBlock()) {
             handleKeyDown()
-            elapsedTime = 0
+            frame = 0
         }
+        frame++
     }
+
+    private fun framesPerBlock() = 15 - (gameModel.level * 2)
 
     private fun render(delta: Long) {
         clearScreen()
@@ -60,27 +64,34 @@ class Game {
     }
 
     fun run() {
+        listenKeyboardInputs()
+        boardModel.createRandomTetrimino()
+        window.setInterval({ gameLoop() }, 40)
+    }
+
+    private fun listenKeyboardInputs() {
         document.body?.onkeydown = {
             if (it is KeyboardEvent) {
                 when (it.keyCode) {
-                    13 -> println("ZZBAMMM")
-                    32 -> boardModel.rotate()
-                    37 -> boardModel.moveLeft()
-                    39 -> boardModel.moveRight()
-                    40 -> handleKeyDown()
+                    Keys.ENTER.code -> boardModel.fallDown()
+                    Keys.SPACE.code -> boardModel.rotate()
+                    Keys.LEFT.code -> boardModel.moveLeft()
+                    Keys.RIGHT.code -> boardModel.moveRight()
+                    Keys.DOWN.code -> handleKeyDown()
                 }
             }
         }
-
-        boardModel.createRandomTetrimino()
-
-        window.setInterval({ gameLoop() }, 40)
     }
 
     private fun handleKeyDown() {
         val moved = boardModel.moveDown()
-        if ( ! moved) {
-            boardModel.startNewTurn()
+        if (!moved) {
+            val clearedLineCount = boardModel.startNewTurn()
+            gameModel.updateScore(clearedLineCount)
+            if (boardModel.isGameOver()) {
+                println("GAME OVER")
+            }
+            println("Score : ${gameModel.score} Level : ${gameModel.level} totalLines : ${gameModel.totalNumberOfLinesCleared}")
         }
     }
 }

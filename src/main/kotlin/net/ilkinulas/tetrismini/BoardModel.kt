@@ -30,6 +30,12 @@ class BoardModel(val width: Int, val height: Int) {
         return true
     }
 
+    fun fallDown() {
+        while (moveDown()) {
+
+        }
+    }
+
     fun moveLeft(): Boolean {
         val collides = tetrimino.checkCollision { x, y ->
             val targetX = tetrimino.position.x + x - 1
@@ -63,11 +69,13 @@ class BoardModel(val width: Int, val height: Int) {
         tetrimino = Tetrimino.createRandom()
     }
 
-    fun startNewTurn() {
+    fun startNewTurn(): Int {
         finalizeTetrimino()
-        removeFullLines()
         createRandomTetrimino()
+        return clearLines()
     }
+
+    fun isGameOver() : Boolean  = (0 until width).firstOrNull { cells[it, 0] == 1 } != null
 
     private fun finalizeTetrimino() {
         for (tx in 0..3) {
@@ -81,7 +89,7 @@ class BoardModel(val width: Int, val height: Int) {
         }
     }
 
-    private fun removeFullLines() {
+    private fun clearLines(): Int {
         val fullLines = mutableListOf<Int>()
         for (y in 0..height - 1) {
             var fullLine = true
@@ -105,7 +113,7 @@ class BoardModel(val width: Int, val height: Int) {
                 }
             }
         }
+        return fullLines.size
     }
-
 
 }

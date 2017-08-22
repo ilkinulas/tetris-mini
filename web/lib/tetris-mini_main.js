@@ -3,10 +3,13 @@ if (typeof kotlin === 'undefined') {
 }
 this['tetris-mini_main'] = function (_, Kotlin) {
   'use strict';
+  var until = Kotlin.kotlin.ranges.until_dqglrj$;
   var downTo = Kotlin.kotlin.ranges.downTo_dqglrj$;
   var println = Kotlin.kotlin.io.println_s8jyv4$;
   var Enum = Kotlin.kotlin.Enum;
   var IntCompanionObject = Kotlin.kotlin.js.internal.IntCompanionObject;
+  Keys.prototype = Object.create(Enum.prototype);
+  Keys.prototype.constructor = Keys;
   Tetrimino$Type.prototype = Object.create(Enum.prototype);
   Tetrimino$Type.prototype.constructor = Tetrimino$Type;
   I.prototype = Object.create(Tetrimino.prototype);
@@ -23,58 +26,31 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   S.prototype.constructor = S;
   Z.prototype = Object.create(Tetrimino.prototype);
   Z.prototype.constructor = Z;
-  function Array2d(width, height, init) {
-    Array2d$Companion_getInstance();
-    if (init === void 0)
-      init = null;
+  function Array2d(width, height) {
     this.width = width;
     this.height = height;
-    this.cells = Kotlin.newArray(Kotlin.imul(this.width, this.height), 0);
-  }
-  function Array2d$Companion() {
-    Array2d$Companion_instance = this;
-  }
-  Array2d$Companion.prototype.copy_raryss$ = function (source, destination) {
-    var $receiver = source.cells;
-    var tmp$, tmp$_0;
-    var index = 0;
-    for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
-      var item = $receiver[tmp$];
-      destination.cells[tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0] = item;
-    }
-  };
-  Array2d$Companion.$metadata$ = {
-    kind: Kotlin.Kind.OBJECT,
-    simpleName: 'Companion',
-    interfaces: []
-  };
-  var Array2d$Companion_instance = null;
-  function Array2d$Companion_getInstance() {
-    if (Array2d$Companion_instance === null) {
-      new Array2d$Companion();
-    }
-    return Array2d$Companion_instance;
+    this.cells_0 = Kotlin.newArray(Kotlin.imul(this.width, this.height), 0);
   }
   Array2d.prototype.reset = function () {
-    var $receiver = this.cells;
+    var $receiver = this.cells_0;
     var tmp$, tmp$_0;
     var index = 0;
     for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
       var item = $receiver[tmp$];
-      this.cells[tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0] = 0;
+      this.cells_0[tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0] = 0;
     }
   };
   Array2d.prototype.coordinatesToIndex_0 = function (x, y) {
     return Kotlin.imul(y, this.width) + x | 0;
   };
   Array2d.prototype.get_vux9f0$ = function (x, y) {
-    return this.cells[this.coordinatesToIndex_0(x, y)];
+    return this.cells_0[this.coordinatesToIndex_0(x, y)];
   };
   Array2d.prototype.set_qt1dr2$ = function (x, y, value) {
-    this.cells[this.coordinatesToIndex_0(x, y)] = value;
+    this.cells_0[this.coordinatesToIndex_0(x, y)] = value;
   };
   Array2d.prototype.iterator = function () {
-    return Kotlin.arrayIterator(this.cells, 'IntArray');
+    return Kotlin.arrayIterator(this.cells_0, 'IntArray');
   };
   Array2d.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
@@ -126,6 +102,10 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     this.tetrimino.moveDown();
     return true;
   };
+  BoardModel.prototype.fallDown = function () {
+    while (this.moveDown()) {
+    }
+  };
   function BoardModel$moveLeft$lambda(this$BoardModel) {
     return function (x, y) {
       var targetX = this$BoardModel.tetrimino.position.x + x - 1 | 0;
@@ -167,8 +147,26 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   };
   BoardModel.prototype.startNewTurn = function () {
     this.finalizeTetrimino_0();
-    this.removeFullLines_0();
     this.createRandomTetrimino();
+    return this.clearLines_0();
+  };
+  BoardModel.prototype.isGameOver = function () {
+    var $receiver = until(0, this.width);
+    var firstOrNull$result;
+    firstOrNull$break: do {
+      var tmp$;
+      tmp$ = $receiver.iterator();
+      while (tmp$.hasNext()) {
+        var element = tmp$.next();
+        if (this.cells_0.get_vux9f0$(element, 0) === 1) {
+          firstOrNull$result = element;
+          break firstOrNull$break;
+        }
+      }
+      firstOrNull$result = null;
+    }
+     while (false);
+    return firstOrNull$result != null;
   };
   BoardModel.prototype.finalizeTetrimino_0 = function () {
     for (var tx = 0; tx <= 3; tx++) {
@@ -181,7 +179,7 @@ this['tetris-mini_main'] = function (_, Kotlin) {
       }
     }
   };
-  BoardModel.prototype.removeFullLines_0 = function () {
+  BoardModel.prototype.clearLines_0 = function () {
     var tmp$, tmp$_0;
     var fullLines = Kotlin.kotlin.collections.ArrayList_init_ww73n8$();
     tmp$ = this.height - 1 | 0;
@@ -214,6 +212,7 @@ this['tetris-mini_main'] = function (_, Kotlin) {
         }
       }
     }
+    return fullLines.size;
   };
   BoardModel.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
@@ -295,7 +294,8 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     this.previousRenderTime_0 = Kotlin.Long.ZERO;
     this.boardModel_0 = new BoardModel(10, 20);
     this.boardView_0 = new BoardView(new Rectangle(0.0, 0.0, this.width_0, this.height_0), Game$Companion_getInstance().context, this.boardModel_0);
-    this.elapsedTime = Kotlin.Long.ZERO;
+    this.gameModel_0 = new GameModel();
+    this.frame_0 = 0;
   }
   function Game$Companion() {
     Game$Companion_instance = this;
@@ -318,11 +318,14 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   Game.prototype.handleInputs_0 = function () {
   };
   Game.prototype.update_0 = function (delta) {
-    this.elapsedTime = this.elapsedTime.add(delta);
-    if (this.elapsedTime.compareTo_11rb$(Kotlin.Long.fromInt(500)) >= 0) {
+    if (this.frame_0 >= this.framesPerBlock_0()) {
       this.handleKeyDown_0();
-      this.elapsedTime = Kotlin.Long.ZERO;
+      this.frame_0 = 0;
     }
+    this.frame_0 = this.frame_0 + 1 | 0;
+  };
+  Game.prototype.framesPerBlock_0 = function () {
+    return 15 - (this.gameModel_0.level * 2 | 0) | 0;
   };
   Game.prototype.render_0 = function (delta) {
     this.clearScreen_0();
@@ -347,38 +350,46 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     return now.subtract(previous);
   };
   function Game$run$lambda(this$Game) {
-    return function (it) {
-      var tmp$;
-      if (Kotlin.isType(it, KeyboardEvent)) {
-        tmp$ = it.keyCode;
-        if (tmp$ === 13)
-          println('ZZBAMMM');
-        else if (tmp$ === 32)
-          this$Game.boardModel_0.rotate();
-        else if (tmp$ === 37)
-          this$Game.boardModel_0.moveLeft();
-        else if (tmp$ === 39)
-          this$Game.boardModel_0.moveRight();
-        else if (tmp$ === 40)
-          this$Game.handleKeyDown_0();
-      }
-    };
-  }
-  function Game$run$lambda_0(this$Game) {
     return function () {
       this$Game.gameLoop_0();
     };
   }
   Game.prototype.run = function () {
-    var tmp$;
-    (tmp$ = document.body) != null ? (tmp$.onkeydown = Game$run$lambda(this)) : null;
+    this.listenKeyboardInputs_0();
     this.boardModel_0.createRandomTetrimino();
-    window.setInterval(Game$run$lambda_0(this), 40);
+    window.setInterval(Game$run$lambda(this), 40);
+  };
+  function Game$listenKeyboardInputs$lambda(this$Game) {
+    return function (it) {
+      var tmp$;
+      if (Kotlin.isType(it, KeyboardEvent)) {
+        tmp$ = it.keyCode;
+        if (tmp$ === Keys$ENTER_getInstance().code)
+          this$Game.boardModel_0.fallDown();
+        else if (tmp$ === Keys$SPACE_getInstance().code)
+          this$Game.boardModel_0.rotate();
+        else if (tmp$ === Keys$LEFT_getInstance().code)
+          this$Game.boardModel_0.moveLeft();
+        else if (tmp$ === Keys$RIGHT_getInstance().code)
+          this$Game.boardModel_0.moveRight();
+        else if (tmp$ === Keys$DOWN_getInstance().code)
+          this$Game.handleKeyDown_0();
+      }
+    };
+  }
+  Game.prototype.listenKeyboardInputs_0 = function () {
+    var tmp$;
+    (tmp$ = document.body) != null ? (tmp$.onkeydown = Game$listenKeyboardInputs$lambda(this)) : null;
   };
   Game.prototype.handleKeyDown_0 = function () {
     var moved = this.boardModel_0.moveDown();
     if (!moved) {
-      this.boardModel_0.startNewTurn();
+      var clearedLineCount = this.boardModel_0.startNewTurn();
+      this.gameModel_0.updateScore_za3lpa$(clearedLineCount);
+      if (this.boardModel_0.isGameOver()) {
+        println('GAME OVER');
+      }
+      println('Score : ' + this.gameModel_0.score + ' Level : ' + this.gameModel_0.level + ' totalLines : ' + this.gameModel_0.totalNumberOfLinesCleared);
     }
   };
   Game.$metadata$ = {
@@ -386,6 +397,119 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     simpleName: 'Game',
     interfaces: []
   };
+  var linesPerLevel;
+  function GameModel() {
+    this.scoreCoefficients_0 = [40, 100, 300, 1200];
+    this.targetNumberOfLinesToLevelUp_0 = linesPerLevel;
+    this.totalNumberOfLinesCleared_26cse0$_0 = 0;
+    this.level_26cse0$_0 = 0;
+    this.score_26cse0$_0 = 0;
+  }
+  Object.defineProperty(GameModel.prototype, 'totalNumberOfLinesCleared', {
+    get: function () {
+      return this.totalNumberOfLinesCleared_26cse0$_0;
+    },
+    set: function (totalNumberOfLinesCleared) {
+      this.totalNumberOfLinesCleared_26cse0$_0 = totalNumberOfLinesCleared;
+    }
+  });
+  Object.defineProperty(GameModel.prototype, 'level', {
+    get: function () {
+      return this.level_26cse0$_0;
+    },
+    set: function (level) {
+      this.level_26cse0$_0 = level;
+    }
+  });
+  Object.defineProperty(GameModel.prototype, 'score', {
+    get: function () {
+      return this.score_26cse0$_0;
+    },
+    set: function (score) {
+      this.score_26cse0$_0 = score;
+    }
+  });
+  GameModel.prototype.updateScore_za3lpa$ = function (numLines) {
+    if (numLines === 0) {
+      return;
+    }
+    this.score = this.score + Kotlin.imul(this.scoreCoefficients_0[numLines - 1 | 0], this.level + 1 | 0) | 0;
+    this.totalNumberOfLinesCleared = this.totalNumberOfLinesCleared + numLines | 0;
+    if (this.totalNumberOfLinesCleared >= this.targetNumberOfLinesToLevelUp_0) {
+      this.targetNumberOfLinesToLevelUp_0 = this.targetNumberOfLinesToLevelUp_0 + linesPerLevel | 0;
+      this.level = this.level + 1 | 0;
+    }
+  };
+  GameModel.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: 'GameModel',
+    interfaces: []
+  };
+  function Keys(name, ordinal, code) {
+    Enum.call(this);
+    this.code = code;
+    this.name$ = name;
+    this.ordinal$ = ordinal;
+  }
+  function Keys_initFields() {
+    Keys_initFields = function () {
+    };
+    Keys$ENTER_instance = new Keys('ENTER', 0, 13);
+    Keys$SPACE_instance = new Keys('SPACE', 1, 32);
+    Keys$LEFT_instance = new Keys('LEFT', 2, 37);
+    Keys$RIGHT_instance = new Keys('RIGHT', 3, 39);
+    Keys$DOWN_instance = new Keys('DOWN', 4, 40);
+  }
+  var Keys$ENTER_instance;
+  function Keys$ENTER_getInstance() {
+    Keys_initFields();
+    return Keys$ENTER_instance;
+  }
+  var Keys$SPACE_instance;
+  function Keys$SPACE_getInstance() {
+    Keys_initFields();
+    return Keys$SPACE_instance;
+  }
+  var Keys$LEFT_instance;
+  function Keys$LEFT_getInstance() {
+    Keys_initFields();
+    return Keys$LEFT_instance;
+  }
+  var Keys$RIGHT_instance;
+  function Keys$RIGHT_getInstance() {
+    Keys_initFields();
+    return Keys$RIGHT_instance;
+  }
+  var Keys$DOWN_instance;
+  function Keys$DOWN_getInstance() {
+    Keys_initFields();
+    return Keys$DOWN_instance;
+  }
+  Keys.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: 'Keys',
+    interfaces: [Enum]
+  };
+  function Keys$values() {
+    return [Keys$ENTER_getInstance(), Keys$SPACE_getInstance(), Keys$LEFT_getInstance(), Keys$RIGHT_getInstance(), Keys$DOWN_getInstance()];
+  }
+  Keys.values = Keys$values;
+  function Keys$valueOf(name) {
+    switch (name) {
+      case 'ENTER':
+        return Keys$ENTER_getInstance();
+      case 'SPACE':
+        return Keys$SPACE_getInstance();
+      case 'LEFT':
+        return Keys$LEFT_getInstance();
+      case 'RIGHT':
+        return Keys$RIGHT_getInstance();
+      case 'DOWN':
+        return Keys$DOWN_getInstance();
+      default:Kotlin.throwISE('No enum constant net.ilkinulas.tetrismini.Keys.' + name);
+    }
+  }
+  Keys.valueOf_61zpoe$ = Keys$valueOf;
   function main(args) {
     var game = new Game();
     game.run();
@@ -830,9 +954,6 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     simpleName: 'Z',
     interfaces: [Tetrimino]
   };
-  Object.defineProperty(Array2d, 'Companion', {
-    get: Array2d$Companion_getInstance
-  });
   var package$net = _.net || (_.net = {});
   var package$ilkinulas = package$net.ilkinulas || (package$net.ilkinulas = {});
   var package$tetrismini = package$ilkinulas.tetrismini || (package$ilkinulas.tetrismini = {});
@@ -846,6 +967,28 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     get: Game$Companion_getInstance
   });
   package$tetrismini.Game = Game;
+  Object.defineProperty(package$tetrismini, 'linesPerLevel', {
+    get: function () {
+      return linesPerLevel;
+    }
+  });
+  package$tetrismini.GameModel = GameModel;
+  Object.defineProperty(Keys, 'ENTER', {
+    get: Keys$ENTER_getInstance
+  });
+  Object.defineProperty(Keys, 'SPACE', {
+    get: Keys$SPACE_getInstance
+  });
+  Object.defineProperty(Keys, 'LEFT', {
+    get: Keys$LEFT_getInstance
+  });
+  Object.defineProperty(Keys, 'RIGHT', {
+    get: Keys$RIGHT_getInstance
+  });
+  Object.defineProperty(Keys, 'DOWN', {
+    get: Keys$DOWN_getInstance
+  });
+  package$tetrismini.Keys = Keys;
   package$tetrismini.main_kand9s$ = main;
   package$tetrismini.Position = Position;
   package$tetrismini.Rectangle = Rectangle;
@@ -882,6 +1025,7 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   package$tetrismini.O = O;
   package$tetrismini.S = S;
   package$tetrismini.Z = Z;
+  linesPerLevel = 10;
   main([]);
   Kotlin.defineModule('tetris-mini_main', _);
   return _;

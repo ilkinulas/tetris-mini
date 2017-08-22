@@ -1,17 +1,9 @@
 package net.ilkinulas.tetrismini
 
 
-class Array2d(val width: Int, val height: Int, init: (() -> Unit)? = null) {
+class Array2d(val width: Int, val height: Int) {
 
-    companion object {
-        fun copy(source: Array2d, destination: Array2d) {
-            source.cells.forEachIndexed { index, value ->
-                destination.cells[index] = value
-            }
-        }
-    }
-
-    val cells = IntArray(width * height)
+    private val cells = IntArray(width * height)
 
     fun reset() {
         cells.forEachIndexed { index, _ -> cells[index] = 0 }
