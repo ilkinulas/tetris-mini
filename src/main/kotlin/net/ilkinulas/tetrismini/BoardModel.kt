@@ -5,9 +5,18 @@ class BoardModel(val width: Int, val height: Int) {
 
     private val cells = Array2d(width, height)
 
-    var tetrimino: Tetrimino = T()
+    var tetrimino: Tetrimino = Tetrimino.createRandom()
+    var nextTetrimino : Tetrimino = Tetrimino.createRandom()
 
     operator fun get(x: Int, y: Int) = cells[x, y]
+
+    fun reset() {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                cells[x, y] = 0
+            }
+        }
+    }
 
     fun rotate() {
         val rotatedBlocks = tetrimino.calculateRotatedBlockPositions()
@@ -65,13 +74,13 @@ class BoardModel(val width: Int, val height: Int) {
 
     fun getTetriminoCells() = tetrimino.cells
     fun getTetriminoPosition() = tetrimino.position
-    fun createRandomTetrimino() {
-        tetrimino = Tetrimino.createRandom()
-    }
 
     fun startNewTurn(): Int {
         finalizeTetrimino()
-        createRandomTetrimino()
+
+        tetrimino = nextTetrimino
+        nextTetrimino = Tetrimino.createRandom()
+
         return clearLines()
     }
 

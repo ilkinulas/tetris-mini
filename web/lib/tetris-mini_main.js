@@ -5,7 +5,6 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   'use strict';
   var until = Kotlin.kotlin.ranges.until_dqglrj$;
   var downTo = Kotlin.kotlin.ranges.downTo_dqglrj$;
-  var println = Kotlin.kotlin.io.println_s8jyv4$;
   var Enum = Kotlin.kotlin.Enum;
   var IntCompanionObject = Kotlin.kotlin.js.internal.IntCompanionObject;
   Keys.prototype = Object.create(Enum.prototype);
@@ -61,10 +60,27 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     this.width = width;
     this.height = height;
     this.cells_0 = new Array2d(this.width, this.height);
-    this.tetrimino = new T();
+    this.tetrimino = Tetrimino$Companion_getInstance().createRandom();
+    this.nextTetrimino = Tetrimino$Companion_getInstance().createRandom();
   }
   BoardModel.prototype.get_vux9f0$ = function (x, y) {
     return this.cells_0.get_vux9f0$(x, y);
+  };
+  BoardModel.prototype.reset = function () {
+    var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4, tmp$_5, tmp$_6;
+    tmp$ = until(0, this.width);
+    tmp$_0 = tmp$.first;
+    tmp$_1 = tmp$.last;
+    tmp$_2 = tmp$.step;
+    for (var x = tmp$_0; x <= tmp$_1; x += tmp$_2) {
+      tmp$_3 = until(0, this.height);
+      tmp$_4 = tmp$_3.first;
+      tmp$_5 = tmp$_3.last;
+      tmp$_6 = tmp$_3.step;
+      for (var y = tmp$_4; y <= tmp$_5; y += tmp$_6) {
+        this.cells_0.set_qt1dr2$(x, y, 0);
+      }
+    }
   };
   BoardModel.prototype.rotate = function () {
     var rotatedBlocks = this.tetrimino.calculateRotatedBlockPositions();
@@ -142,12 +158,10 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   BoardModel.prototype.getTetriminoPosition = function () {
     return this.tetrimino.position;
   };
-  BoardModel.prototype.createRandomTetrimino = function () {
-    this.tetrimino = Tetrimino$Companion_getInstance().createRandom();
-  };
   BoardModel.prototype.startNewTurn = function () {
     this.finalizeTetrimino_0();
-    this.createRandomTetrimino();
+    this.tetrimino = this.nextTetrimino;
+    this.nextTetrimino = Tetrimino$Companion_getInstance().createRandom();
     return this.clearLines_0();
   };
   BoardModel.prototype.isGameOver = function () {
@@ -221,10 +235,11 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   };
   function BoardView(bounds, context2D, model) {
     BoardView$Companion_getInstance();
-    this.context2D = context2D;
+    this.bounds = bounds;
+    this.context2D_0 = context2D;
     this.model = model;
-    this.cellWidth_0 = bounds.width / this.model.width;
-    this.cellHeight_0 = bounds.height / this.model.height;
+    this.cellWidth_0 = this.bounds.width / this.model.width;
+    this.cellHeight_0 = this.bounds.height / this.model.height;
     this.debug_0 = false;
   }
   function BoardView$Companion() {
@@ -245,11 +260,18 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     return BoardView$Companion_instance;
   }
   BoardView.prototype.render = function () {
-    var tmp$, tmp$_0, tmp$_1, tmp$_2;
-    tmp$ = this.model.width - 1 | 0;
-    for (var row = 0; row <= tmp$; row++) {
-      tmp$_0 = this.model.height - 1 | 0;
-      for (var col = 0; col <= tmp$_0; col++) {
+    var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4, tmp$_5, tmp$_6, tmp$_7, tmp$_8, tmp$_9, tmp$_10, tmp$_11, tmp$_12, tmp$_13, tmp$_14;
+    this.drawBorder_0();
+    tmp$ = until(0, this.model.width);
+    tmp$_0 = tmp$.first;
+    tmp$_1 = tmp$.last;
+    tmp$_2 = tmp$.step;
+    for (var row = tmp$_0; row <= tmp$_1; row += tmp$_2) {
+      tmp$_3 = until(0, this.model.height);
+      tmp$_4 = tmp$_3.first;
+      tmp$_5 = tmp$_3.last;
+      tmp$_6 = tmp$_3.step;
+      for (var col = tmp$_4; col <= tmp$_5; col += tmp$_6) {
         var value = this.model.get_vux9f0$(row, col);
         if (value === 0)
           this.drawEmptyCell_0(row, col);
@@ -259,42 +281,78 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     }
     var tetriminoCells = this.model.getTetriminoCells();
     var pos = this.model.getTetriminoPosition();
-    tmp$_1 = tetriminoCells.width - 1 | 0;
-    for (var row_0 = 0; row_0 <= tmp$_1; row_0++) {
-      tmp$_2 = tetriminoCells.height - 1 | 0;
-      for (var col_0 = 0; col_0 <= tmp$_2; col_0++) {
+    tmp$_7 = until(0, tetriminoCells.width);
+    tmp$_8 = tmp$_7.first;
+    tmp$_9 = tmp$_7.last;
+    tmp$_10 = tmp$_7.step;
+    for (var row_0 = tmp$_8; row_0 <= tmp$_9; row_0 += tmp$_10) {
+      tmp$_11 = until(0, tetriminoCells.height);
+      tmp$_12 = tmp$_11.first;
+      tmp$_13 = tmp$_11.last;
+      tmp$_14 = tmp$_11.step;
+      for (var col_0 = tmp$_12; col_0 <= tmp$_13; col_0 += tmp$_14) {
         if (tetriminoCells.get_vux9f0$(row_0, col_0) === 1) {
           this.drawFilledCell_0(pos.x + row_0 | 0, pos.y + col_0 | 0);
         }
       }
     }
     if (this.debug_0) {
-      this.context2D.strokeStyle = BoardView$Companion_getInstance().debugColor;
-      this.context2D.strokeRect(this.model.tetrimino.position.x * this.cellWidth_0, this.model.tetrimino.position.y * this.cellHeight_0, this.cellWidth_0 * 4, this.cellHeight_0 * 4);
+      this.context2D_0.strokeStyle = BoardView$Companion_getInstance().debugColor;
+      this.context2D_0.strokeRect(this.model.tetrimino.position.x * this.cellWidth_0, this.model.tetrimino.position.y * this.cellHeight_0, this.cellWidth_0 * 4, this.cellHeight_0 * 4);
     }
   };
+  BoardView.prototype.drawBorder_0 = function () {
+    this.context2D_0.strokeStyle = Theme_getInstance().borderColor;
+    this.context2D_0.strokeRect(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
+  };
   BoardView.prototype.drawFilledCell_0 = function (row, col) {
-    this.context2D.fillStyle = BoardView$Companion_getInstance().defaultColor;
-    this.context2D.fillRect(row * this.cellWidth_0 + 5, col * this.cellHeight_0 + 5, this.cellWidth_0 - 10, this.cellHeight_0 - 10);
-    this.context2D.clearRect(row * this.cellWidth_0 + 10, col * this.cellHeight_0 + 10, this.cellWidth_0 - 20, this.cellHeight_0 - 20);
+    this.context2D_0.fillStyle = Theme_getInstance().tetriminoColor;
+    this.context2D_0.fillRect(row * this.cellWidth_0 + 2, col * this.cellHeight_0 + 2, this.cellWidth_0 - 4, this.cellHeight_0 - 4);
   };
   BoardView.prototype.drawEmptyCell_0 = function (row, col) {
-    this.context2D.strokeStyle = BoardView$Companion_getInstance().defaultColor;
-    this.context2D.strokeRect(row * this.cellWidth_0, col * this.cellHeight_0, this.cellWidth_0, this.cellHeight_0);
+    this.context2D_0.strokeStyle = Theme_getInstance().boardGridColor;
+    this.context2D_0.strokeRect(row * this.cellWidth_0, col * this.cellHeight_0, this.cellWidth_0, this.cellHeight_0);
   };
   BoardView.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
     simpleName: 'BoardView',
+    interfaces: [View]
+  };
+  function Theme() {
+    Theme_instance = this;
+    this.borderColor = '#37393A';
+    this.boardGridColor = '#B2DBBF';
+    this.sidePanelBgColor = '#B2DBBF';
+    this.fontColor = '#247BA0';
+    this.tetriminoColor = '#247BA0';
+    this.fontStyle = '20px Consolas';
+    this.gameOverFontColor = '#B91372';
+  }
+  Theme.$metadata$ = {
+    kind: Kotlin.Kind.OBJECT,
+    simpleName: 'Theme',
     interfaces: []
   };
+  var Theme_instance = null;
+  function Theme_getInstance() {
+    if (Theme_instance === null) {
+      new Theme();
+    }
+    return Theme_instance;
+  }
   function Game() {
     Game$Companion_getInstance();
+    this.boardWidth_0 = 0;
+    Game$Companion_getInstance().canvas.width = 600;
+    Game$Companion_getInstance().canvas.height = Game$Companion_getInstance().canvas.width / 3.0 * 4.0 | 0;
+    this.boardWidth_0 = Game$Companion_getInstance().canvas.width / 2.0;
     this.width_0 = Game$Companion_getInstance().canvas.width;
     this.height_0 = Game$Companion_getInstance().canvas.height;
     this.previousRenderTime_0 = Kotlin.Long.ZERO;
     this.boardModel_0 = new BoardModel(10, 20);
-    this.boardView_0 = new BoardView(new Rectangle(0.0, 0.0, this.width_0, this.height_0), Game$Companion_getInstance().context, this.boardModel_0);
+    this.boardView_0 = new BoardView(new Rectangle(0.0, 0.0, this.boardWidth_0, this.boardWidth_0 * 2), Game$Companion_getInstance().context, this.boardModel_0);
     this.gameModel_0 = new GameModel();
+    this.scoreView_0 = new ScoreBoardView(new Rectangle(this.boardWidth_0, 0.0, this.boardWidth_0 / 2, this.boardWidth_0 * 2), Game$Companion_getInstance().context, this.boardModel_0, this.gameModel_0);
     this.frame_0 = 0;
   }
   function Game$Companion() {
@@ -318,8 +376,11 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   Game.prototype.handleInputs_0 = function () {
   };
   Game.prototype.update_0 = function (delta) {
+    if (this.gameModel_0.gameOver) {
+      return;
+    }
     if (this.frame_0 >= this.framesPerBlock_0()) {
-      this.handleKeyDown_0();
+      this.moveDown_0();
       this.frame_0 = 0;
     }
     this.frame_0 = this.frame_0 + 1 | 0;
@@ -330,6 +391,7 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   Game.prototype.render_0 = function (delta) {
     this.clearScreen_0();
     this.boardView_0.render();
+    this.scoreView_0.render();
   };
   Game.prototype.clearScreen_0 = function () {
     Game$Companion_getInstance().context.clearRect(0.0, 0.0, this.width_0, this.height_0);
@@ -356,24 +418,28 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   }
   Game.prototype.run = function () {
     this.listenKeyboardInputs_0();
-    this.boardModel_0.createRandomTetrimino();
     window.setInterval(Game$run$lambda(this), 40);
   };
   function Game$listenKeyboardInputs$lambda(this$Game) {
     return function (it) {
       var tmp$;
       if (Kotlin.isType(it, KeyboardEvent)) {
-        tmp$ = it.keyCode;
-        if (tmp$ === Keys$ENTER_getInstance().code)
-          this$Game.boardModel_0.fallDown();
-        else if (tmp$ === Keys$SPACE_getInstance().code)
-          this$Game.boardModel_0.rotate();
-        else if (tmp$ === Keys$LEFT_getInstance().code)
-          this$Game.boardModel_0.moveLeft();
-        else if (tmp$ === Keys$RIGHT_getInstance().code)
-          this$Game.boardModel_0.moveRight();
-        else if (tmp$ === Keys$DOWN_getInstance().code)
-          this$Game.handleKeyDown_0();
+        if (this$Game.gameModel_0.gameOver) {
+          this$Game.restartGame_0();
+        }
+         else {
+          tmp$ = it.keyCode;
+          if (tmp$ === Keys$SPACE_getInstance().code)
+            this$Game.boardModel_0.fallDown();
+          else if (tmp$ === Keys$LEFT_getInstance().code)
+            this$Game.boardModel_0.moveLeft();
+          else if (tmp$ === Keys$RIGHT_getInstance().code)
+            this$Game.boardModel_0.moveRight();
+          else if (tmp$ === Keys$DOWN_getInstance().code)
+            this$Game.moveDown_0();
+          else if (tmp$ === Keys$UP_getInstance().code)
+            this$Game.boardModel_0.rotate();
+        }
       }
     };
   }
@@ -381,15 +447,18 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     var tmp$;
     (tmp$ = document.body) != null ? (tmp$.onkeydown = Game$listenKeyboardInputs$lambda(this)) : null;
   };
-  Game.prototype.handleKeyDown_0 = function () {
+  Game.prototype.restartGame_0 = function () {
+    this.gameModel_0.reset();
+    this.boardModel_0.reset();
+  };
+  Game.prototype.moveDown_0 = function () {
     var moved = this.boardModel_0.moveDown();
     if (!moved) {
       var clearedLineCount = this.boardModel_0.startNewTurn();
       this.gameModel_0.updateScore_za3lpa$(clearedLineCount);
       if (this.boardModel_0.isGameOver()) {
-        println('GAME OVER');
+        this.gameModel_0.gameOver = true;
       }
-      println('Score : ' + this.gameModel_0.score + ' Level : ' + this.gameModel_0.level + ' totalLines : ' + this.gameModel_0.totalNumberOfLinesCleared);
     }
   };
   Game.$metadata$ = {
@@ -404,6 +473,7 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     this.totalNumberOfLinesCleared_26cse0$_0 = 0;
     this.level_26cse0$_0 = 0;
     this.score_26cse0$_0 = 0;
+    this.gameOver = false;
   }
   Object.defineProperty(GameModel.prototype, 'totalNumberOfLinesCleared', {
     get: function () {
@@ -429,6 +499,12 @@ this['tetris-mini_main'] = function (_, Kotlin) {
       this.score_26cse0$_0 = score;
     }
   });
+  GameModel.prototype.reset = function () {
+    this.gameOver = false;
+    this.score = 0;
+    this.level = 0;
+    this.totalNumberOfLinesCleared = 0;
+  };
   GameModel.prototype.updateScore_za3lpa$ = function (numLines) {
     if (numLines === 0) {
       return;
@@ -457,8 +533,9 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     Keys$ENTER_instance = new Keys('ENTER', 0, 13);
     Keys$SPACE_instance = new Keys('SPACE', 1, 32);
     Keys$LEFT_instance = new Keys('LEFT', 2, 37);
-    Keys$RIGHT_instance = new Keys('RIGHT', 3, 39);
-    Keys$DOWN_instance = new Keys('DOWN', 4, 40);
+    Keys$UP_instance = new Keys('UP', 3, 38);
+    Keys$RIGHT_instance = new Keys('RIGHT', 4, 39);
+    Keys$DOWN_instance = new Keys('DOWN', 5, 40);
   }
   var Keys$ENTER_instance;
   function Keys$ENTER_getInstance() {
@@ -474,6 +551,11 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   function Keys$LEFT_getInstance() {
     Keys_initFields();
     return Keys$LEFT_instance;
+  }
+  var Keys$UP_instance;
+  function Keys$UP_getInstance() {
+    Keys_initFields();
+    return Keys$UP_instance;
   }
   var Keys$RIGHT_instance;
   function Keys$RIGHT_getInstance() {
@@ -491,7 +573,7 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     interfaces: [Enum]
   };
   function Keys$values() {
-    return [Keys$ENTER_getInstance(), Keys$SPACE_getInstance(), Keys$LEFT_getInstance(), Keys$RIGHT_getInstance(), Keys$DOWN_getInstance()];
+    return [Keys$ENTER_getInstance(), Keys$SPACE_getInstance(), Keys$LEFT_getInstance(), Keys$UP_getInstance(), Keys$RIGHT_getInstance(), Keys$DOWN_getInstance()];
   }
   Keys.values = Keys$values;
   function Keys$valueOf(name) {
@@ -502,6 +584,8 @@ this['tetris-mini_main'] = function (_, Kotlin) {
         return Keys$SPACE_getInstance();
       case 'LEFT':
         return Keys$LEFT_getInstance();
+      case 'UP':
+        return Keys$UP_getInstance();
       case 'RIGHT':
         return Keys$RIGHT_getInstance();
       case 'DOWN':
@@ -597,6 +681,71 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   };
   Rectangle.prototype.equals = function (other) {
     return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.x, other.x) && Kotlin.equals(this.y, other.y) && Kotlin.equals(this.width, other.width) && Kotlin.equals(this.height, other.height)))));
+  };
+  function ScoreBoardView(bounds, context2D, boardModel, gameModel) {
+    this.bounds_0 = bounds;
+    this.context2D_0 = context2D;
+    this.boardModel = boardModel;
+    this.gameModel = gameModel;
+  }
+  ScoreBoardView.prototype.render = function () {
+    this.drawBorderAndBg_0();
+    this.drawNextTetrimino_0();
+    this.drawScoreboard_0();
+    this.drawGameOverText_0();
+  };
+  ScoreBoardView.prototype.drawGameOverText_0 = function () {
+    if (this.gameModel.gameOver) {
+      var yOffset = 350.0;
+      this.context2D_0.font = Theme_getInstance().fontStyle;
+      this.context2D_0.fillStyle = Theme_getInstance().gameOverFontColor;
+      this.context2D_0.fillText('GAME OVER', this.bounds_0.x + 10, yOffset);
+      this.context2D_0.fillText('Press any key', this.bounds_0.x + 10, yOffset + 30.0);
+      this.context2D_0.fillText('to restart', this.bounds_0.x + 10, yOffset + 60.0);
+    }
+  };
+  ScoreBoardView.prototype.drawScoreboard_0 = function () {
+    this.context2D_0.font = Theme_getInstance().fontStyle;
+    this.context2D_0.fillStyle = Theme_getInstance().fontColor;
+    this.context2D_0.fillText('Score : ' + this.gameModel.score, this.bounds_0.x + 10, 150.0);
+    this.context2D_0.fillText('Level : ' + this.gameModel.level, this.bounds_0.x + 10, 200.0);
+    this.context2D_0.fillText('Lines : ' + this.gameModel.totalNumberOfLinesCleared, this.bounds_0.x + 10, 250.0);
+  };
+  ScoreBoardView.prototype.drawBorderAndBg_0 = function () {
+    this.context2D_0.strokeStyle = Theme_getInstance().borderColor;
+    this.context2D_0.strokeRect(this.bounds_0.x, this.bounds_0.y, this.bounds_0.width, this.bounds_0.height);
+    this.context2D_0.fillStyle = Theme_getInstance().sidePanelBgColor;
+    this.context2D_0.fillRect(this.bounds_0.x, this.bounds_0.y, this.bounds_0.width, this.bounds_0.height);
+  };
+  ScoreBoardView.prototype.drawNextTetrimino_0 = function () {
+    var tmp$;
+    if ((tmp$ = this.boardModel.nextTetrimino) != null) {
+      var tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4, tmp$_5, tmp$_6, tmp$_7;
+      var blockSize = 30.0;
+      this.context2D_0.fillStyle = Theme_getInstance().tetriminoColor;
+      var tetriminoCells = tmp$.cells;
+      var pos = new Position((this.bounds_0.x | 0) + 15 | 0, (this.bounds_0.y | 0) + 15 | 0);
+      tmp$_0 = until(0, tetriminoCells.width);
+      tmp$_1 = tmp$_0.first;
+      tmp$_2 = tmp$_0.last;
+      tmp$_3 = tmp$_0.step;
+      for (var row = tmp$_1; row <= tmp$_2; row += tmp$_3) {
+        tmp$_4 = until(0, tetriminoCells.height);
+        tmp$_5 = tmp$_4.first;
+        tmp$_6 = tmp$_4.last;
+        tmp$_7 = tmp$_4.step;
+        for (var col = tmp$_5; col <= tmp$_6; col += tmp$_7) {
+          if (tetriminoCells.get_vux9f0$(row, col) === 1) {
+            this.context2D_0.fillRect(pos.x + blockSize * row, pos.y + blockSize * col, blockSize, blockSize);
+          }
+        }
+      }
+    }
+  };
+  ScoreBoardView.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: 'ScoreBoardView',
+    interfaces: []
   };
   function Tetrimino(type) {
     Tetrimino$Companion_getInstance();
@@ -954,6 +1103,13 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     simpleName: 'Z',
     interfaces: [Tetrimino]
   };
+  function View() {
+  }
+  View.$metadata$ = {
+    kind: Kotlin.Kind.INTERFACE,
+    simpleName: 'View',
+    interfaces: []
+  };
   var package$net = _.net || (_.net = {});
   var package$ilkinulas = package$net.ilkinulas || (package$net.ilkinulas = {});
   var package$tetrismini = package$ilkinulas.tetrismini || (package$ilkinulas.tetrismini = {});
@@ -963,6 +1119,9 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     get: BoardView$Companion_getInstance
   });
   package$tetrismini.BoardView = BoardView;
+  Object.defineProperty(package$tetrismini, 'Theme', {
+    get: Theme_getInstance
+  });
   Object.defineProperty(Game, 'Companion', {
     get: Game$Companion_getInstance
   });
@@ -982,6 +1141,9 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   Object.defineProperty(Keys, 'LEFT', {
     get: Keys$LEFT_getInstance
   });
+  Object.defineProperty(Keys, 'UP', {
+    get: Keys$UP_getInstance
+  });
   Object.defineProperty(Keys, 'RIGHT', {
     get: Keys$RIGHT_getInstance
   });
@@ -992,6 +1154,7 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   package$tetrismini.main_kand9s$ = main;
   package$tetrismini.Position = Position;
   package$tetrismini.Rectangle = Rectangle;
+  package$tetrismini.ScoreBoardView = ScoreBoardView;
   Object.defineProperty(Tetrimino$Type, 'I', {
     get: Tetrimino$Type$I_getInstance
   });
@@ -1025,6 +1188,7 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   package$tetrismini.O = O;
   package$tetrismini.S = S;
   package$tetrismini.Z = Z;
+  package$tetrismini.View = View;
   linesPerLevel = 10;
   main([]);
   Kotlin.defineModule('tetris-mini_main', _);

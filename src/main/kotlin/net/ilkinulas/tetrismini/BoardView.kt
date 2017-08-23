@@ -3,7 +3,7 @@ package net.ilkinulas.tetrismini
 import org.w3c.dom.CanvasRenderingContext2D
 
 
-class BoardView(bounds: Rectangle<Double>, val context2D: CanvasRenderingContext2D, val model: BoardModel) {
+class BoardView(val bounds: Rectangle<Double>, private val context2D: CanvasRenderingContext2D, val model: BoardModel) : View {
 
     private val cellWidth = bounds.width / model.width
     private val cellHeight = bounds.height / model.height
@@ -15,9 +15,10 @@ class BoardView(bounds: Rectangle<Double>, val context2D: CanvasRenderingContext
 
     private var debug = false
 
-    fun render() {
-        for (row in 0..model.width - 1) {
-            for (col in 0..model.height - 1) {
+    override fun render() {
+        drawBorder()
+        for (row in 0 until model.width) {
+            for (col in 0 until model.height) {
                 val value = model[row, col]
                 when (value) {
                     0 -> drawEmptyCell(row, col)
@@ -27,8 +28,8 @@ class BoardView(bounds: Rectangle<Double>, val context2D: CanvasRenderingContext
         }
         val tetriminoCells = model.getTetriminoCells()
         val pos = model.getTetriminoPosition()
-        for (row in 0..tetriminoCells.width - 1) {
-            for (col in 0..tetriminoCells.height - 1) {
+        for (row in 0 until tetriminoCells.width) {
+            for (col in 0 until tetriminoCells.height) {
                 if (tetriminoCells[row, col] == 1) {
                     drawFilledCell(pos.x + row, pos.y + col)
                 }
@@ -45,22 +46,22 @@ class BoardView(bounds: Rectangle<Double>, val context2D: CanvasRenderingContext
         }
     }
 
+    private fun drawBorder() {
+        context2D.strokeStyle = Theme.borderColor
+        context2D.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height)
+    }
+
     private fun drawFilledCell(row: Int, col: Int) {
-        context2D.fillStyle = defaultColor
+        context2D.fillStyle = Theme.tetriminoColor
         context2D.fillRect(
-                row * cellWidth + 5,
-                col * cellHeight + 5,
-                cellWidth - 10,
-                cellHeight - 10)
-        context2D.clearRect(
-                row * cellWidth + 10,
-                col * cellHeight + 10,
-                cellWidth - 20,
-                cellHeight - 20)
+                row * cellWidth + 2,
+                col * cellHeight + 2,
+                cellWidth - 4,
+                cellHeight - 4)
     }
 
     private fun drawEmptyCell(row: Int, col: Int) {
-        context2D.strokeStyle = defaultColor
+        context2D.strokeStyle = Theme.boardGridColor
         context2D.strokeRect(
                 row * cellWidth,
                 col * cellHeight,

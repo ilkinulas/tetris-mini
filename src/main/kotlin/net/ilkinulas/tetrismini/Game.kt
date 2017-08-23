@@ -7,6 +7,16 @@ import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.js.Date
 
+object Theme {
+    const val borderColor = "#37393A"
+    const val boardGridColor = "#B2DBBF"
+    const val sidePanelBgColor = "#B2DBBF"
+    const val fontColor = "#247BA0"
+    const val tetriminoColor = "#247BA0"
+    const val fontStyle = "20px Consolas"
+    const val gameOverFontColor = "#B91372"
+}
+
 class Game {
 
     companion object {
@@ -14,13 +24,26 @@ class Game {
         val context = canvas.getContext("2d") as CanvasRenderingContext2D
     }
 
+    private val boardWidth: Double
+
+    init {
+        canvas.width = 600
+        canvas.height = (canvas.width / 3.0 * 4.0).toInt()
+        boardWidth = canvas.width / 2.0
+    }
+
     private val width = canvas.width.toDouble()
     private val height = canvas.height.toDouble()
     private var previousRenderTime = 0L
 
     private val boardModel = BoardModel(10, 20)
-    private val boardView = BoardView(Rectangle(0.0, 0.0, width, height), context, boardModel)
+    private val boardView = BoardView(
+            Rectangle(0.0, 0.0, boardWidth, boardWidth * 2),
+            context, boardModel)
     private val gameModel = GameModel()
+    private val scoreView = ScoreBoardView(
+            Rectangle(boardWidth, 0.0, boardWidth / 2, boardWidth * 2),
+            context, boardModel, gameModel)
 
     private fun handleInputs() {
     }
@@ -28,8 +51,11 @@ class Game {
     private var frame = 0
 
     private fun update(delta: Long) {
+        if (gameModel.gameOver) {
+            return
+        }
         if (frame >= framesPerBlock()) {
-            handleKeyDown()
+            moveDown()
             frame = 0
         }
         frame++
@@ -40,6 +66,7 @@ class Game {
     private fun render(delta: Long) {
         clearScreen()
         boardView.render()
+        scoreView.render()
     }
 
     private fun clearScreen() {
@@ -65,33 +92,40 @@ class Game {
 
     fun run() {
         listenKeyboardInputs()
-        boardModel.createRandomTetrimino()
         window.setInterval({ gameLoop() }, 40)
     }
 
     private fun listenKeyboardInputs() {
         document.body?.onkeydown = {
             if (it is KeyboardEvent) {
-                when (it.keyCode) {
-                    Keys.ENTER.code -> boardModel.fallDown()
-                    Keys.SPACE.code -> boardModel.rotate()
-                    Keys.LEFT.code -> boardModel.moveLeft()
-                    Keys.RIGHT.code -> boardModel.moveRight()
-                    Keys.DOWN.code -> handleKeyDown()
+                if (gameModel.gameOver) {
+                    restartGame()
+                } else {
+                    when (it.keyCode) {
+                        Keys.SPACE.code -> boardModel.fallDown()
+                        Keys.LEFT.code -> boardModel.moveLeft()
+                        Keys.RIGHT.code -> boardModel.moveRight()
+                        Keys.DOWN.code -> moveDown()
+                        Keys.UP.code -> boardModel.rotate()
+                    }
                 }
             }
         }
     }
 
-    private fun handleKeyDown() {
+    private fun restartGame() {
+        gameModel.reset()
+        boardModel.reset()
+    }
+
+    private fun moveDown() {
         val moved = boardModel.moveDown()
         if (!moved) {
             val clearedLineCount = boardModel.startNewTurn()
             gameModel.updateScore(clearedLineCount)
             if (boardModel.isGameOver()) {
-                println("GAME OVER")
+                gameModel.gameOver = true
             }
-            println("Score : ${gameModel.score} Level : ${gameModel.level} totalLines : ${gameModel.totalNumberOfLinesCleared}")
         }
     }
 }

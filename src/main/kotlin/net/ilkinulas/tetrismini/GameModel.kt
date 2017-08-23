@@ -16,6 +16,15 @@ class GameModel {
     var score: Int = 0
         private set
 
+    var gameOver : Boolean = false
+
+    fun reset() {
+        gameOver = false
+        score = 0
+        level = 0
+        totalNumberOfLinesCleared = 0
+    }
+
     fun updateScore(numLines: Int) {
         if (numLines == 0) {
             return
