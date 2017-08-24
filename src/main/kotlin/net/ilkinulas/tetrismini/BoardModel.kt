@@ -100,9 +100,9 @@ class BoardModel(val width: Int, val height: Int) {
 
     private fun clearLines(): Int {
         val fullLines = mutableListOf<Int>()
-        for (y in 0..height - 1) {
+        for (y in 0 until height) {
             var fullLine = true
-            for (x in 0..width - 1) {
+            for (x in 0 until width) {
                 if (cells[x, y] == 0) {
                     fullLine = false
                     break
@@ -114,7 +114,7 @@ class BoardModel(val width: Int, val height: Int) {
         }
 
         fullLines.forEach { line ->
-            for (i in 0..width - 1) {
+            for (i in 0 until width) {
                 cells[i, line] = 0
                 for (j in line downTo 0) {
                     cells[i, j] = cells[i, j - 1]

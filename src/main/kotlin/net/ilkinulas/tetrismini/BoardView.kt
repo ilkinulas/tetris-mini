@@ -3,19 +3,17 @@ package net.ilkinulas.tetrismini
 import org.w3c.dom.CanvasRenderingContext2D
 
 
-class BoardView(val bounds: Rectangle<Double>, private val context2D: CanvasRenderingContext2D, val model: BoardModel) : View {
+class BoardView(
+        private val bounds: Rectangle<Double>,
+        private val context2D: CanvasRenderingContext2D,
+        private val model: BoardModel) {
 
     private val cellWidth = bounds.width / model.width
     private val cellHeight = bounds.height / model.height
 
-    companion object {
-        const val defaultColor = "black"
-        const val debugColor = "red"
-    }
-
     private var debug = false
 
-    override fun render() {
+    fun render() {
         drawBorder()
         for (row in 0 until model.width) {
             for (col in 0 until model.height) {
@@ -37,7 +35,7 @@ class BoardView(val bounds: Rectangle<Double>, private val context2D: CanvasRend
         }
 
         if (debug) {
-            context2D.strokeStyle = debugColor
+            context2D.strokeStyle = Theme.debugColor
             context2D.strokeRect(
                     model.tetrimino.position.x.toDouble() * cellWidth,
                     model.tetrimino.position.y.toDouble() * cellHeight,

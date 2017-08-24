@@ -15,6 +15,7 @@ object Theme {
     const val tetriminoColor = "#247BA0"
     const val fontStyle = "20px Consolas"
     const val gameOverFontColor = "#B91372"
+    const val debugColor = "red"
 }
 
 class Game {

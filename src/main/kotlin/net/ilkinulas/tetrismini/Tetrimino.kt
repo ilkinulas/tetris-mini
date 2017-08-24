@@ -3,14 +3,14 @@ package net.ilkinulas.tetrismini
 import kotlin.js.Math
 
 
-abstract class Tetrimino(val type: Type) {
+abstract class Tetrimino(private val type: Type) {
 
     enum class Type { I, O, T, S, Z, J, L }
 
     companion object {
         fun createRandom(): Tetrimino {
             val values = Type.values()
-            return when (values[(Math.random() * values.size).toInt()]) {
+            val tetrimino = when (values[(Math.random() * values.size).toInt()]) {
                 Type.I -> I()
                 Type.O -> O()
                 Type.T -> T()
@@ -19,6 +19,8 @@ abstract class Tetrimino(val type: Type) {
                 Type.J -> J()
                 Type.L -> L()
             }
+            tetrimino.initialize()
+            return tetrimino
         }
     }
 
@@ -28,7 +30,6 @@ abstract class Tetrimino(val type: Type) {
     var bounds: Rectangle<Int>
 
     init {
-        initialize()
         bounds = calculateBounds()
     }
 
@@ -39,8 +40,8 @@ abstract class Tetrimino(val type: Type) {
             return blockPositions()
         }
         val list = mutableListOf<Position>()
-        for (x in 0..cells.width - 1) {
-            for (y in 0..cells.height - 1) {
+        for (x in 0 until cells.width) {
+            for (y in 0 until cells.height) {
                 if (cells[x, y] == 1) {
                     val relPosToPivot = Position(x, y) - pivot
                     val newPos = pivot - Position(-relPosToPivot.y, relPosToPivot.x)
@@ -62,13 +63,13 @@ abstract class Tetrimino(val type: Type) {
         bounds = calculateBounds()
     }
 
-    fun calculateBounds(): Rectangle<Int> {
+    private fun calculateBounds(): Rectangle<Int> {
         var minX = Int.MAX_VALUE
         var minY = Int.MAX_VALUE
         var maxX = Int.MIN_VALUE
         var maxY = Int.MIN_VALUE
-        for (x in 0..cells.width - 1) {
-            for (y in 0..cells.height - 1) {
+        for (x in 0 until cells.width) {
+            for (y in 0 until cells.height) {
                 if (cells[x, y] == 1) {
                     if (x < minX) minX = x
                     if (x > maxX) maxX = x

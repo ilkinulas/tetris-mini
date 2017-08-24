@@ -194,13 +194,19 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     }
   };
   BoardModel.prototype.clearLines_0 = function () {
-    var tmp$, tmp$_0;
+    var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4, tmp$_5, tmp$_6;
     var fullLines = Kotlin.kotlin.collections.ArrayList_init_ww73n8$();
-    tmp$ = this.height - 1 | 0;
-    for (var y = 0; y <= tmp$; y++) {
+    tmp$ = until(0, this.height);
+    tmp$_0 = tmp$.first;
+    tmp$_1 = tmp$.last;
+    tmp$_2 = tmp$.step;
+    for (var y = tmp$_0; y <= tmp$_1; y += tmp$_2) {
       var fullLine = true;
-      tmp$_0 = this.width - 1 | 0;
-      for (var x = 0; x <= tmp$_0; x++) {
+      tmp$_3 = until(0, this.width);
+      tmp$_4 = tmp$_3.first;
+      tmp$_5 = tmp$_3.last;
+      tmp$_6 = tmp$_3.step;
+      for (var x = tmp$_4; x <= tmp$_5; x += tmp$_6) {
         if (this.cells_0.get_vux9f0$(x, y) === 0) {
           fullLine = false;
           break;
@@ -210,17 +216,20 @@ this['tetris-mini_main'] = function (_, Kotlin) {
         fullLines.add_11rb$(y);
       }
     }
-    var tmp$_1;
-    tmp$_1 = fullLines.iterator();
-    while (tmp$_1.hasNext()) {
-      var element = tmp$_1.next();
-      var tmp$_2, tmp$_3;
-      tmp$_2 = this.width - 1 | 0;
-      for (var i = 0; i <= tmp$_2; i++) {
+    var tmp$_7;
+    tmp$_7 = fullLines.iterator();
+    while (tmp$_7.hasNext()) {
+      var element = tmp$_7.next();
+      var tmp$_8, tmp$_9, tmp$_10, tmp$_11, tmp$_12;
+      tmp$_8 = until(0, this.width);
+      tmp$_9 = tmp$_8.first;
+      tmp$_10 = tmp$_8.last;
+      tmp$_11 = tmp$_8.step;
+      for (var i = tmp$_9; i <= tmp$_10; i += tmp$_11) {
         this.cells_0.set_qt1dr2$(i, element, 0);
-        tmp$_3 = downTo(element, 0).iterator();
-        while (tmp$_3.hasNext()) {
-          var j = tmp$_3.next();
+        tmp$_12 = downTo(element, 0).iterator();
+        while (tmp$_12.hasNext()) {
+          var j = tmp$_12.next();
           this.cells_0.set_qt1dr2$(i, j, this.cells_0.get_vux9f0$(i, j - 1 | 0));
           this.cells_0.set_qt1dr2$(i, j - 1 | 0, 0);
         }
@@ -234,53 +243,35 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     interfaces: []
   };
   function BoardView(bounds, context2D, model) {
-    BoardView$Companion_getInstance();
-    this.bounds = bounds;
+    this.bounds_0 = bounds;
     this.context2D_0 = context2D;
-    this.model = model;
-    this.cellWidth_0 = this.bounds.width / this.model.width;
-    this.cellHeight_0 = this.bounds.height / this.model.height;
+    this.model_0 = model;
+    this.cellWidth_0 = this.bounds_0.width / this.model_0.width;
+    this.cellHeight_0 = this.bounds_0.height / this.model_0.height;
     this.debug_0 = false;
-  }
-  function BoardView$Companion() {
-    BoardView$Companion_instance = this;
-    this.defaultColor = 'black';
-    this.debugColor = 'red';
-  }
-  BoardView$Companion.$metadata$ = {
-    kind: Kotlin.Kind.OBJECT,
-    simpleName: 'Companion',
-    interfaces: []
-  };
-  var BoardView$Companion_instance = null;
-  function BoardView$Companion_getInstance() {
-    if (BoardView$Companion_instance === null) {
-      new BoardView$Companion();
-    }
-    return BoardView$Companion_instance;
   }
   BoardView.prototype.render = function () {
     var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4, tmp$_5, tmp$_6, tmp$_7, tmp$_8, tmp$_9, tmp$_10, tmp$_11, tmp$_12, tmp$_13, tmp$_14;
     this.drawBorder_0();
-    tmp$ = until(0, this.model.width);
+    tmp$ = until(0, this.model_0.width);
     tmp$_0 = tmp$.first;
     tmp$_1 = tmp$.last;
     tmp$_2 = tmp$.step;
     for (var row = tmp$_0; row <= tmp$_1; row += tmp$_2) {
-      tmp$_3 = until(0, this.model.height);
+      tmp$_3 = until(0, this.model_0.height);
       tmp$_4 = tmp$_3.first;
       tmp$_5 = tmp$_3.last;
       tmp$_6 = tmp$_3.step;
       for (var col = tmp$_4; col <= tmp$_5; col += tmp$_6) {
-        var value = this.model.get_vux9f0$(row, col);
+        var value = this.model_0.get_vux9f0$(row, col);
         if (value === 0)
           this.drawEmptyCell_0(row, col);
         else if (value === 1)
           this.drawFilledCell_0(row, col);
       }
     }
-    var tetriminoCells = this.model.getTetriminoCells();
-    var pos = this.model.getTetriminoPosition();
+    var tetriminoCells = this.model_0.getTetriminoCells();
+    var pos = this.model_0.getTetriminoPosition();
     tmp$_7 = until(0, tetriminoCells.width);
     tmp$_8 = tmp$_7.first;
     tmp$_9 = tmp$_7.last;
@@ -297,13 +288,13 @@ this['tetris-mini_main'] = function (_, Kotlin) {
       }
     }
     if (this.debug_0) {
-      this.context2D_0.strokeStyle = BoardView$Companion_getInstance().debugColor;
-      this.context2D_0.strokeRect(this.model.tetrimino.position.x * this.cellWidth_0, this.model.tetrimino.position.y * this.cellHeight_0, this.cellWidth_0 * 4, this.cellHeight_0 * 4);
+      this.context2D_0.strokeStyle = Theme_getInstance().debugColor;
+      this.context2D_0.strokeRect(this.model_0.tetrimino.position.x * this.cellWidth_0, this.model_0.tetrimino.position.y * this.cellHeight_0, this.cellWidth_0 * 4, this.cellHeight_0 * 4);
     }
   };
   BoardView.prototype.drawBorder_0 = function () {
     this.context2D_0.strokeStyle = Theme_getInstance().borderColor;
-    this.context2D_0.strokeRect(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
+    this.context2D_0.strokeRect(this.bounds_0.x, this.bounds_0.y, this.bounds_0.width, this.bounds_0.height);
   };
   BoardView.prototype.drawFilledCell_0 = function (row, col) {
     this.context2D_0.fillStyle = Theme_getInstance().tetriminoColor;
@@ -316,7 +307,7 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   BoardView.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
     simpleName: 'BoardView',
-    interfaces: [View]
+    interfaces: []
   };
   function Theme() {
     Theme_instance = this;
@@ -327,6 +318,7 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     this.tetriminoColor = '#247BA0';
     this.fontStyle = '20px Consolas';
     this.gameOverFontColor = '#B91372';
+    this.debugColor = 'red';
   }
   Theme.$metadata$ = {
     kind: Kotlin.Kind.OBJECT,
@@ -685,8 +677,8 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   function ScoreBoardView(bounds, context2D, boardModel, gameModel) {
     this.bounds_0 = bounds;
     this.context2D_0 = context2D;
-    this.boardModel = boardModel;
-    this.gameModel = gameModel;
+    this.boardModel_0 = boardModel;
+    this.gameModel_0 = gameModel;
   }
   ScoreBoardView.prototype.render = function () {
     this.drawBorderAndBg_0();
@@ -695,7 +687,7 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     this.drawGameOverText_0();
   };
   ScoreBoardView.prototype.drawGameOverText_0 = function () {
-    if (this.gameModel.gameOver) {
+    if (this.gameModel_0.gameOver) {
       var yOffset = 350.0;
       this.context2D_0.font = Theme_getInstance().fontStyle;
       this.context2D_0.fillStyle = Theme_getInstance().gameOverFontColor;
@@ -707,9 +699,9 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   ScoreBoardView.prototype.drawScoreboard_0 = function () {
     this.context2D_0.font = Theme_getInstance().fontStyle;
     this.context2D_0.fillStyle = Theme_getInstance().fontColor;
-    this.context2D_0.fillText('Score : ' + this.gameModel.score, this.bounds_0.x + 10, 150.0);
-    this.context2D_0.fillText('Level : ' + this.gameModel.level, this.bounds_0.x + 10, 200.0);
-    this.context2D_0.fillText('Lines : ' + this.gameModel.totalNumberOfLinesCleared, this.bounds_0.x + 10, 250.0);
+    this.context2D_0.fillText('Score : ' + this.gameModel_0.score, this.bounds_0.x + 10, 150.0);
+    this.context2D_0.fillText('Level : ' + this.gameModel_0.level, this.bounds_0.x + 10, 200.0);
+    this.context2D_0.fillText('Lines : ' + this.gameModel_0.totalNumberOfLinesCleared, this.bounds_0.x + 10, 250.0);
   };
   ScoreBoardView.prototype.drawBorderAndBg_0 = function () {
     this.context2D_0.strokeStyle = Theme_getInstance().borderColor;
@@ -718,26 +710,23 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     this.context2D_0.fillRect(this.bounds_0.x, this.bounds_0.y, this.bounds_0.width, this.bounds_0.height);
   };
   ScoreBoardView.prototype.drawNextTetrimino_0 = function () {
-    var tmp$;
-    if ((tmp$ = this.boardModel.nextTetrimino) != null) {
-      var tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4, tmp$_5, tmp$_6, tmp$_7;
-      var blockSize = 30.0;
-      this.context2D_0.fillStyle = Theme_getInstance().tetriminoColor;
-      var tetriminoCells = tmp$.cells;
-      var pos = new Position((this.bounds_0.x | 0) + 15 | 0, (this.bounds_0.y | 0) + 15 | 0);
-      tmp$_0 = until(0, tetriminoCells.width);
-      tmp$_1 = tmp$_0.first;
-      tmp$_2 = tmp$_0.last;
-      tmp$_3 = tmp$_0.step;
-      for (var row = tmp$_1; row <= tmp$_2; row += tmp$_3) {
-        tmp$_4 = until(0, tetriminoCells.height);
-        tmp$_5 = tmp$_4.first;
-        tmp$_6 = tmp$_4.last;
-        tmp$_7 = tmp$_4.step;
-        for (var col = tmp$_5; col <= tmp$_6; col += tmp$_7) {
-          if (tetriminoCells.get_vux9f0$(row, col) === 1) {
-            this.context2D_0.fillRect(pos.x + blockSize * row, pos.y + blockSize * col, blockSize, blockSize);
-          }
+    var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4, tmp$_5, tmp$_6;
+    var blockSize = 30.0;
+    this.context2D_0.fillStyle = Theme_getInstance().tetriminoColor;
+    var tetriminoCells = this.boardModel_0.nextTetrimino.cells;
+    var pos = new Position((this.bounds_0.x | 0) + 15 | 0, (this.bounds_0.y | 0) + 15 | 0);
+    tmp$ = until(0, tetriminoCells.width);
+    tmp$_0 = tmp$.first;
+    tmp$_1 = tmp$.last;
+    tmp$_2 = tmp$.step;
+    for (var row = tmp$_0; row <= tmp$_1; row += tmp$_2) {
+      tmp$_3 = until(0, tetriminoCells.height);
+      tmp$_4 = tmp$_3.first;
+      tmp$_5 = tmp$_3.last;
+      tmp$_6 = tmp$_3.step;
+      for (var col = tmp$_4; col <= tmp$_5; col += tmp$_6) {
+        if (tetriminoCells.get_vux9f0$(row, col) === 1) {
+          this.context2D_0.fillRect(pos.x + blockSize * row, pos.y + blockSize * col, blockSize, blockSize);
         }
       }
     }
@@ -749,13 +738,12 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   };
   function Tetrimino(type) {
     Tetrimino$Companion_getInstance();
-    this.type = type;
+    this.type_x2d6vs$_0 = type;
     this.cells = new Array2d(4, 4);
     this.pivot = new Position();
     this.position = new Position();
     this.bounds = null;
-    this.initialize();
-    this.bounds = this.calculateBounds();
+    this.bounds = this.calculateBounds_x2d6vs$_0();
   }
   function Tetrimino$Type(name, ordinal) {
     Enum.call(this);
@@ -860,7 +848,9 @@ this['tetris-mini_main'] = function (_, Kotlin) {
       tmp$_0 = new L();
     else
       tmp$_0 = Kotlin.noWhenBranchMatched();
-    return tmp$_0;
+    var tetrimino = tmp$_0;
+    tetrimino.initialize();
+    return tetrimino;
   };
   Tetrimino$Companion.$metadata$ = {
     kind: Kotlin.Kind.OBJECT,
@@ -875,15 +865,21 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     return Tetrimino$Companion_instance;
   }
   Tetrimino.prototype.calculateRotatedBlockPositions = function () {
-    var tmp$, tmp$_0;
-    if (this.type === Tetrimino$Type$O_getInstance()) {
+    var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4, tmp$_5, tmp$_6;
+    if (this.type_x2d6vs$_0 === Tetrimino$Type$O_getInstance()) {
       return this.blockPositions_x2d6vs$_0();
     }
     var list = Kotlin.kotlin.collections.ArrayList_init_ww73n8$();
-    tmp$ = this.cells.width - 1 | 0;
-    for (var x = 0; x <= tmp$; x++) {
-      tmp$_0 = this.cells.height - 1 | 0;
-      for (var y = 0; y <= tmp$_0; y++) {
+    tmp$ = until(0, this.cells.width);
+    tmp$_0 = tmp$.first;
+    tmp$_1 = tmp$.last;
+    tmp$_2 = tmp$.step;
+    for (var x = tmp$_0; x <= tmp$_1; x += tmp$_2) {
+      tmp$_3 = until(0, this.cells.height);
+      tmp$_4 = tmp$_3.first;
+      tmp$_5 = tmp$_3.last;
+      tmp$_6 = tmp$_3.step;
+      for (var y = tmp$_4; y <= tmp$_5; y += tmp$_6) {
         if (this.cells.get_vux9f0$(x, y) === 1) {
           var relPosToPivot = (new Position(x, y)).minus_30fsf6$(this.pivot);
           var newPos = this.pivot.minus_30fsf6$(new Position(-relPosToPivot.y, relPosToPivot.x));
@@ -893,10 +889,10 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     }
     var firstOrNull_6jwkkr$result;
     firstOrNull_6jwkkr$break: do {
-      var tmp$_1;
-      tmp$_1 = list.iterator();
-      while (tmp$_1.hasNext()) {
-        var element = tmp$_1.next();
+      var tmp$_7;
+      tmp$_7 = list.iterator();
+      while (tmp$_7.hasNext()) {
+        var element = tmp$_7.next();
         if (element.y < 0) {
           firstOrNull_6jwkkr$result = element;
           break firstOrNull_6jwkkr$break;
@@ -906,10 +902,10 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     }
      while (false);
     if (firstOrNull_6jwkkr$result != null) {
-      var tmp$_2;
-      tmp$_2 = list.iterator();
-      while (tmp$_2.hasNext()) {
-        var element_0 = tmp$_2.next();
+      var tmp$_8;
+      tmp$_8 = list.iterator();
+      while (tmp$_8.hasNext()) {
+        var element_0 = tmp$_8.next();
         element_0.y = element_0.y + 1 | 0;
       }
     }
@@ -923,18 +919,24 @@ this['tetris-mini_main'] = function (_, Kotlin) {
       var element = tmp$.next();
       this.cells.set_qt1dr2$(element.x, element.y, 1);
     }
-    this.bounds = this.calculateBounds();
+    this.bounds = this.calculateBounds_x2d6vs$_0();
   };
-  Tetrimino.prototype.calculateBounds = function () {
-    var tmp$, tmp$_0;
+  Tetrimino.prototype.calculateBounds_x2d6vs$_0 = function () {
+    var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4, tmp$_5, tmp$_6;
     var minX = IntCompanionObject.MAX_VALUE;
     var minY = IntCompanionObject.MAX_VALUE;
     var maxX = IntCompanionObject.MIN_VALUE;
     var maxY = IntCompanionObject.MIN_VALUE;
-    tmp$ = this.cells.width - 1 | 0;
-    for (var x = 0; x <= tmp$; x++) {
-      tmp$_0 = this.cells.height - 1 | 0;
-      for (var y = 0; y <= tmp$_0; y++) {
+    tmp$ = until(0, this.cells.width);
+    tmp$_0 = tmp$.first;
+    tmp$_1 = tmp$.last;
+    tmp$_2 = tmp$.step;
+    for (var x = tmp$_0; x <= tmp$_1; x += tmp$_2) {
+      tmp$_3 = until(0, this.cells.height);
+      tmp$_4 = tmp$_3.first;
+      tmp$_5 = tmp$_3.last;
+      tmp$_6 = tmp$_3.step;
+      for (var y = tmp$_4; y <= tmp$_5; y += tmp$_6) {
         if (this.cells.get_vux9f0$(x, y) === 1) {
           if (x < minX)
             minX = x;
@@ -1103,21 +1105,11 @@ this['tetris-mini_main'] = function (_, Kotlin) {
     simpleName: 'Z',
     interfaces: [Tetrimino]
   };
-  function View() {
-  }
-  View.$metadata$ = {
-    kind: Kotlin.Kind.INTERFACE,
-    simpleName: 'View',
-    interfaces: []
-  };
   var package$net = _.net || (_.net = {});
   var package$ilkinulas = package$net.ilkinulas || (package$net.ilkinulas = {});
   var package$tetrismini = package$ilkinulas.tetrismini || (package$ilkinulas.tetrismini = {});
   package$tetrismini.Array2d = Array2d;
   package$tetrismini.BoardModel = BoardModel;
-  Object.defineProperty(BoardView, 'Companion', {
-    get: BoardView$Companion_getInstance
-  });
   package$tetrismini.BoardView = BoardView;
   Object.defineProperty(package$tetrismini, 'Theme', {
     get: Theme_getInstance
@@ -1188,7 +1180,6 @@ this['tetris-mini_main'] = function (_, Kotlin) {
   package$tetrismini.O = O;
   package$tetrismini.S = S;
   package$tetrismini.Z = Z;
-  package$tetrismini.View = View;
   linesPerLevel = 10;
   main([]);
   Kotlin.defineModule('tetris-mini_main', _);
